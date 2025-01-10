@@ -31,28 +31,13 @@ jobs:
         pytest --cov=devops_tasks --cov-report=xml
   
     # Step 4: SonarQube Analysis
-    - name: Download and Extract SonarScanner
-      run: |
-        curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-        unzip -o sonar-scanner-cli.zip -d $HOME
-        export PATH="$HOME/sonar-scanner-4.8.0.2856-linux/bin:$PATH"
-
-    - name: Debug SonarScanner Path
-      run: |
-        ls -la $HOME/sonar-scanner-4.8.0.2856-linux/bin
-        echo $PATH
-
-    - name: SonarQube Analysis
-      env:
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        $HOME/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
-          -Dsonar.projectKey=devops-tasks-tests-token \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.login=$SONAR_TOKEN \
-          -Dsonar.python.coverage.reportPaths=coverage.xml
+    - name: Sonarless Code Scan
+      uses: gitricko/sonarless@v1.2
+      with:
+        sonar-source-path: '.'
+        sonar-project-name: 'DevOps Tasks'
+        sonar-project-key: 'devops-tasks-key'
+        sonar-python-coverage-report-paths: 'coverage.xml'
   
     # Step 5: Log in to Docker Hub
     - name: Log in to Docker Hub
