@@ -31,13 +31,16 @@ jobs:
         pytest --cov=devops_tasks --cov-report=xml
   
     # Step 4: SonarQube Analysis
+    - name: Start SonarQube
+      run: |
+        docker run -d --name sonarqube -p 9000:9000 sonarqube
+        sleep 30
+
     - name: SonarQube Analysis
       env:
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        SONAR_HOST_URL: http://localhost:9000
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-        unzip sonar-scanner-cli.zip
         ./sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
           -Dsonar.projectKey=devops-tasks-tests \
           -Dsonar.sources=. \
