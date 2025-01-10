@@ -48,7 +48,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         $HOME/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
-          -Dsonar.projectKey=devops-tasks-tests \
+          -Dsonar.projectKey=devops-tasks-tests-token \
           -Dsonar.sources=. \
           -Dsonar.host.url=$SONAR_HOST_URL \
           -Dsonar.login=$SONAR_TOKEN \
