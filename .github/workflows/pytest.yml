@@ -34,10 +34,10 @@ jobs:
     - name: Sonarless Code Scan
       uses: gitricko/sonarless@v1.2
       with:
-        sonar-source-path: ''
-        sonar-project-name: ''
-        sonar-project-key: ''
-        sonar-metrics-path: './'
+        sonar-source-path: '.'
+        sonar-project-name: 'DevOps Tasks'
+        sonar-project-key: 'devops-tasks-key'
+        sonar-metrics-path: './sonar-metrics.json'
   
     # Step 5: Log in to Docker Hub
     - name: Log in to Docker Hub
