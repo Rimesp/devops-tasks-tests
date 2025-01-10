@@ -37,7 +37,7 @@ jobs:
         sonar-source-path: '.'
         sonar-project-name: 'DevOps Tasks'
         sonar-project-key: 'devops-tasks-key'
-        sonar-python-coverage-report-paths: 'coverage.xml'
+        sonar-metrics-path: './'
   
     # Step 5: Log in to Docker Hub
     - name: Log in to Docker Hub
