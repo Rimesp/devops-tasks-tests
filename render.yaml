@@ -3,8 +3,5 @@ services:
     name: devops-tasks-tests
     env: docker
     plan: free
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /
-    envVars:
-      - key: PORT
-        value: 5000
+    dockerfilePath: ./Dockerfile  # Path to your Dockerfile
+    healthCheckPath: /           # Default root path 
