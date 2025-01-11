@@ -55,18 +55,4 @@ jobs:
     - name: Push Docker image
       run: docker push rrim/devops-tasks-tests:latest
 
-      # Step 8: Install Railway CLI
-    - name: Install Railway CLI
-      run: curl -fsSL https://railway.app/install.sh | sh
-
-    # Step 9: Deploy to Railway
-    - name: Deploy to Railway
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      run: |
-        railway up --service devops-tasks
-        
-      # Step 10: Health Check
-    - name: Health Check
-      run: |
-        curl -f https://your-railway-app-url.com/health || exit 1
+    
