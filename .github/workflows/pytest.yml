@@ -43,7 +43,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Step 6: Install Required Shell Utilities
+      # Step 6: Install Shell Utilities
       - name: Install Shell Utilities
         run: sudo apt-get update && sudo apt-get install -y shellcheck unzip
 
@@ -55,10 +55,11 @@ jobs:
           mv sonar-scanner-4.7.0.2747-linux $HOME/sonar-scanner
           echo "export PATH=$HOME/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
 
-      # Step 8: Configure Java and Path for SonarScanner
-      - name: Set Up Java Environment for SonarScanner
+      # Step 8: Set Environment Variables
+      - name: Configure Environment Variables
         run: |
           echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
+          echo "PATH=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$HOME/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
           source $GITHUB_ENV
           java -version
 
@@ -66,7 +67,6 @@ jobs:
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64
         run: |
           $HOME/sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=Rimesp_devops-tasks-tests \
