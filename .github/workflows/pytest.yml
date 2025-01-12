@@ -58,12 +58,13 @@ jobs:
       - name: Verify Java Version
         run: java -version
 
-       # Step 9: Run SonarCloud Analysis
+            # Step 9: Run SonarCloud Analysis
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64
-          PATH: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$PATH
+          JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64
+          PATH: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:/usr/bin:$PATH
         run: |
           $HOME/sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=Rimesp_devops-tasks-tests \
@@ -71,3 +72,5 @@ jobs:
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
+        shell: bash
+
