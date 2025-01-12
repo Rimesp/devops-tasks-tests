@@ -1,4 +1,5 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
@@ -42,29 +43,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Step 6: Verify Java Version
-      - name: Verify Java Version
-        run: java -version
-
-      # Step 7: Download and Set Up SonarScanner
+      # Step 6: Download and Set Up SonarScanner
       - name: Download SonarScanner
         run: |
           curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
           unzip -q sonar-scanner-cli.zip
           mv sonar-scanner-4.7.0.2747-linux $HOME/sonar-scanner
 
-      # Step 8: Set JAVA_HOME and PATH
-      - name: Configure Environment
-        run: |
-          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
-          echo "PATH=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$HOME/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
+      # Step 7: Ensure Shell Utilities Are Installed
+      - name: Install Shell Utilities
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
 
-      # Step 9: Run SonarCloud Analysis
+      # Step 8: Set Java Environment Globally
+      - name: Set Java Environment
+        run: echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
+
+      # Step 9: Verify Java Version
+      - name: Verify Java Version
+        run: java -version
+
+      # Step 10: Run SonarCloud Analysis
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64
-          PATH: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$HOME/sonar-scanner/bin:$PATH
+          PATH: /bin:/usr/bin:/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$HOME/sonar-scanner/bin:$PATH
+        shell: bash
         run: |
           $HOME/sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=Rimesp_devops-tasks-tests \
@@ -72,6 +76,3 @@ jobs:
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
-        shell: bash
-
-
