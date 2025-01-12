@@ -33,11 +33,11 @@ def test_validate_configuration_parametrize(config_file):
 
 # SECTION 3: EDGE CASES
 def test_deploy_application_invalid_input():
-    with pytest.raises(Exception): 
+    with pytest.raises(Exception):  # Expect exception for invalid input
         deploy_application(123)
 
 def test_check_service_status_invalid_service():
-    status = check_service_status("")
+    status = check_service_status("")  # Empty service name
     assert status in ["running", "stopped", "failed"], "Empty service name should return a valid status"
 
 def test_validate_configuration_missing_file():

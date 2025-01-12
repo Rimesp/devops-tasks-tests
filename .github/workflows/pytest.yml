@@ -33,7 +33,7 @@ jobs:
         run: |
           pytest --cov=devops_tasks --cov-report=xml
           mv coverage.xml pytest-coverage.xml
-          
+
        # Step 5: Run SonarCloud Analysis
       - name: SonarCloud Analysis
         env:
@@ -44,5 +44,4 @@ jobs:
             -Dsonar.organization=rimesp \
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.python.coverage.reportPaths=pytest-coverage.xml    
-
+            -Dsonar.python.coverage.reportPaths=pytest-coverage.xml   
