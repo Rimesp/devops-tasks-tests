@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  test-analyze-monitor:
-    name: Test, Analyze, and Monitor
+  test-and-deploy:
+    name: Test and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -75,44 +75,14 @@ jobs:
           docker build -t rrim/devops-tasks-tests:latest .
           docker push rrim/devops-tasks-tests:latest
 
-      # Step 10: Start Prometheus, Grafana, and Pushgateway
-      - name: Start Monitoring Containers
+      # Step 10: Simulate Deployment
+      - name: Simulate Deployment
         run: |
-          docker network create monitoring
-          docker run -d --name prometheus --network monitoring -p 9090:9090 -v $(pwd)/prometheus_data:/prometheus prom/prometheus
-          docker run -d --name grafana --network monitoring -p 3000:3000 grafana/grafana
-          docker run -d --name pushgateway --network monitoring -p 9091:9091 prom/pushgateway
+          python -c "from devops_tasks import deploy_application; deploy_application('1.0')"
+          echo "Deployment simulation complete."
 
-      # Step 11: Configure Prometheus
-      - name: Configure Prometheus
+      # Step 11: Validate Deployment
+      - name: Validate Deployment
         run: |
-          cat <<EOF > prometheus.yml
-          global:
-            scrape_interval: 15s
-          scrape_configs:
-            - job_name: 'pushgateway'
-              static_configs:
-                - targets: ['pushgateway:9091']
-          EOF
-          docker cp prometheus.yml prometheus:/etc/prometheus/prometheus.yml
-          docker exec prometheus kill -HUP 1
-
-      # Step 12: Push Metrics to Prometheus
-      - name: Push Metrics to Prometheus
-        run: |
-          echo "ci_cd_deployment_duration_seconds 3.2" | curl --data-binary @- http://localhost:9091/metrics/job/deployment
-          echo "ci_cd_deployment_status 1" | curl --data-binary @- http://localhost:9091/metrics/job/deployment_validation
-
-      # Step 13: Save Prometheus Logs
-      - name: Save Prometheus Logs
-        uses: actions/upload-artifact@v3
-        with:
-          name: prometheus-logs
-          path: prometheus_data
-
-      # Step 14: Clean Up Monitoring
-      - name: Clean Up Monitoring
-        run: |
-          docker stop prometheus grafana pushgateway
-          docker rm prometheus grafana pushgateway
-          docker network rm monitoring
+          python -c "from devops_tasks import check_service_status; check_service_status('web')"
+          echo "Deployment validation complete."
