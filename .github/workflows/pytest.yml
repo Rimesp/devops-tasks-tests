@@ -61,3 +61,55 @@ jobs:
             -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Step 8: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+      # Step 9: Build and Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t rrim/devops-tasks-tests:latest .
+          docker push rrim/devops-tasks-tests:latest
+
+      # Step 10: Start Prometheus and Grafana
+      - name: Start Prometheus and Grafana
+        run: |
+          docker network create monitoring
+          docker run -d --name prometheus --network monitoring -p 9090:9090 prom/prometheus
+          docker run -d --name grafana --network monitoring -p 3000:3000 grafana/grafana
+
+      # Step 11: Configure Prometheus
+      - name: Configure Prometheus
+        run: |
+          echo "global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: 'devops-app'
+    static_configs:
+      - targets: ['localhost:8080']" > prometheus.yml
+          docker cp prometheus.yml prometheus:/etc/prometheus/prometheus.yml
+          docker exec prometheus kill -HUP 1
+
+      # Step 12: Push Metrics to Prometheus
+      - name: Push Metrics to Prometheus
+        run: |
+          echo "ci_cd_deployment_duration_seconds 3.2" | curl --data-binary @- http://localhost:9091/metrics/job/deployment
+          echo "ci_cd_deployment_status 1" | curl --data-binary @- http://localhost:9091/metrics/job/deployment_validation
+
+      # Step 13: Upload Prometheus Logs as Artifacts
+      - name: Save Prometheus Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: prometheus-logs
+          path: /var/lib/prometheus
+
+      # Step 14: Shut Down Prometheus and Grafana
+      - name: Clean Up Monitoring
+        run: |
+          docker stop prometheus grafana
+          docker rm prometheus grafana
+          docker network rm monitoring
