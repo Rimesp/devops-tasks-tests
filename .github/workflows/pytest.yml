@@ -34,7 +34,14 @@ jobs:
           pytest --cov=devops_tasks --cov-report=xml
           mv coverage.xml pytest-coverage.xml
 
-       # Step 5: Run SonarCloud Analysis
+        # Step 5: Install SonarScanner
+      - name: Install SonarScanner
+        run: |
+          curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+          unzip sonar-scanner-cli.zip -d $HOME
+          export PATH="$HOME/sonar-scanner-4.7.0.2747-linux/bin:$PATH"
+
+      # Step 6: Run SonarCloud Analysis
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -44,4 +51,4 @@ jobs:
             -Dsonar.organization=rimesp \
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.python.coverage.reportPaths=pytest-coverage.xml   
+            -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
