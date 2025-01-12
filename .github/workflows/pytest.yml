@@ -37,7 +37,7 @@ jobs:
       # Step 5: Run Tests and Generate Coverage Report
       - name: Run Tests and Coverage
         run: |
-          pytest --cov=devops_tasks --cov-report=xml
+          pytest --cov=. --cov-report=xml --cov-config=.coveragerc
           mv coverage.xml pytest-coverage.xml
 
       # Step 6: Verify Coverage File
@@ -61,10 +61,3 @@ jobs:
             -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Step 8: Upload Coverage Report as Artifact (Optional)
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytest-coverage-report
-          path: pytest-coverage.xml
