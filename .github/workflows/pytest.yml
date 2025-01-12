@@ -36,41 +36,12 @@ jobs:
           pytest --cov=devops_tasks --cov-report=xml
           mv coverage.xml pytest-coverage.xml
 
-      # Step 5: Set Up Java Environment (Java 17)
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      # Step 5: Run SonarCloud Analysis Using Action
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      # Step 6: Install Shell Utilities
-      - name: Install Shell Utilities
-        run: sudo apt-get update && sudo apt-get install -y shellcheck unzip
-
-      # Step 7: Download and Configure SonarScanner
-      - name: Download SonarScanner
-        run: |
-          curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-          unzip -q sonar-scanner-cli.zip
-          mv sonar-scanner-4.7.0.2747-linux $HOME/sonar-scanner
-          echo "export PATH=$HOME/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-
-      # Step 8: Set Environment Variables
-      - name: Configure Environment Variables
-        run: |
-          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
-          echo "PATH=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$HOME/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-          source $GITHUB_ENV
-          java -version
-
-      # Step 9: Run SonarCloud Analysis
-      - name: SonarCloud Analysis
+          projectKey: Rimesp_devops-tasks-tests
+          organization: rimesp
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          $HOME/sonar-scanner/bin/sonar-scanner \
-            -Dsonar.projectKey=Rimesp_devops-tasks-tests \
-            -Dsonar.organization=rimesp \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
+          SONAR_SCANNER_OPTS: -Dsonar.python.coverage.reportPaths=pytest-coverage.xml
