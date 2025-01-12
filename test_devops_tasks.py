@@ -16,7 +16,7 @@ def test_check_service_status():
         assert status == "running", "check_service_status should return 'running' for a valid service"
 
 def test_validate_configuration():
-    with patch("devops_tasks.open", create=True) as mock_open:
+    with patch("builtins.open", create=True) as mock_open:
         mock_open.return_value.__enter__.return_value.read.return_value = "valid configuration"
         is_valid = validate_configuration("config.yml")
         assert is_valid is True, "validate_configuration should return True for valid configuration"
@@ -35,7 +35,7 @@ def test_check_service_status_invalid_service():
         assert status == "failed", "check_service_status should handle empty service names gracefully"
 
 def test_validate_configuration_missing_file():
-    with patch("devops_tasks.os.path.exists") as mock_exists:
+    with patch("os.path.exists") as mock_exists:
         mock_exists.return_value = False
         result = validate_configuration("non_existent_file.yml")  # Missing file
         assert result is False, "validate_configuration should return False for missing files"
@@ -79,3 +79,10 @@ def test_mocked_call_behavior():
         mock_service_status.return_value = "running"
         check_service_status("web")
         mock_service_status.assert_called_once_with("web")
+
+# SECTION 5: EDGE CASE MOCKING
+def test_validate_configuration_empty_file():
+    with patch("builtins.open", create=True) as mock_open:
+        mock_open.return_value.__enter__.return_value.read.return_value = ""
+        is_valid = validate_configuration("config.yml")
+        assert is_valid is False, "validate_configuration should return False for empty configuration files"
