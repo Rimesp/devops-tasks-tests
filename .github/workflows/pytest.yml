@@ -1,3 +1,5 @@
+name: CI/CD Pipeline
+
 on:
   push:
     branches:
@@ -16,33 +18,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set Up Python Environment
+      # Step 2: Set Up Java Environment
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      # Step 3: Set Up Python Environment
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
-      # Step 3: Install Dependencies
+      # Step 4: Install Dependencies
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt pytest-cov
 
-      # Step 4: Run Tests and Generate Coverage Report
+      # Step 5: Run Tests and Generate Coverage Report
       - name: Run Tests
         run: |
           pytest --cov=devops_tasks --cov-report=xml
           mv coverage.xml pytest-coverage.xml
 
-        # Step 5: Install SonarScanner CLI
+      # Step 6: Install SonarScanner CLI
       - name: Install SonarScanner
         run: |
           curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
           unzip sonar-scanner-cli.zip -d $HOME
           export PATH="$HOME/sonar-scanner-4.7.0.2747-linux/bin:$PATH"
-          echo "PATH updated to include sonar-scanner"
 
-      # Step 6: Run SonarCloud Analysis
+      # Step 7: Run SonarCloud Analysis
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
