@@ -18,29 +18,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set Up Python Environment
+      # Step 2: Fetch Full Git History
+      - name: Fetch all history for all branches
+        run: git fetch --unshallow
+
+      # Step 3: Set Up Python Environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
-      # Step 3: Install Dependencies
+      # Step 4: Install Dependencies
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
 
-      # Step 4: Run Tests and Generate Coverage Report
+      # Step 5: Run Tests and Generate Coverage Report
       - name: Run Tests and Coverage
         run: |
           pytest --cov=devops_tasks --cov-report=xml
           mv coverage.xml pytest-coverage.xml
 
-      # Step 5: Verify Coverage File
+      # Step 6: Verify Coverage File
       - name: Verify Coverage File
-        run: ls -l pytest-coverage.xml || echo "Coverage file not found"
+        run: |
+          if [ ! -f pytest-coverage.xml ]; then
+            echo "Coverage file not found!"
+            exit 1
+          fi
+          echo "Coverage file found: pytest-coverage.xml"
 
-      # Step 6: Run SonarCloud Analysis Using Generated Coverage Report
+      # Step 7: Run SonarCloud Analysis Using Generated Coverage Report
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
@@ -53,7 +62,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Step 7: Upload Coverage Report as Artifact (Optional)
+      # Step 8: Upload Coverage Report as Artifact (Optional)
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v3
         with:
