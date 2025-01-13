@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: devops-tasks-tests
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile  # Path to your Dockerfile
-    healthCheckPath: /           # Default root path 
